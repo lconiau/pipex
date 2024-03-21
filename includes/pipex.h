@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   pipex.h                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lconiau <lconiau@student.42lyon.fr>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/03/04 21:43:54 by lconiau           #+#    #+#             */
+/*   Updated: 2024/03/15 22:58:16 by lconiau          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef PIPEX_H
 # define PIPEX_H
 # include <unistd.h>
@@ -9,6 +21,7 @@
 # include <string.h>
 # include <stdio.h>
 # include "../gnl/get_next_line.h"
+# include "../libft/libft.h"
 
 # define ERR_INFILE "Infile"
 # define ERR_OUTFILE "Outfile"
@@ -32,15 +45,17 @@ typedef struct s_pipex
 	int		pipe_nmbs;
 	int		*pipe;
 	int		idx;
-}t_pipex;
+	int		infile_ok;
+	int		outfile_ok;
+}			t_pipex;
 
-
+void	ft_free_arr(char **s);
 void	close_pipes(t_pipex *pipex);
-void	child(t_pipex pipex, char **argv, char **envp);
+void	child(t_pipex *pipex, char **argv, char **envp);
 void	parent_free(t_pipex *pipex);
 void	child_free(t_pipex *pipex);
 void	pipe_free(t_pipex *pipex);
-char	*find_path(char **envp);
+void	find_path(char **envp, t_pipex *pipex);
 void	get_infile(char **argv, t_pipex *pipex);
 void	get_outfile(char *argv, t_pipex *pipex);
 int		args_in(char *arg, t_pipex *pipex);

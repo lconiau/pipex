@@ -1,4 +1,16 @@
-#include "../includes/pipex_bonus.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lconiau <lconiau@student.42lyon.fr>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/03/04 21:31:27 by lconiau           #+#    #+#             */
+/*   Updated: 2024/03/21 14:16:39 by lconiau          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../includes/pipex.h"
 
 static void	creat_pipes(t_pipex *pipex)
 {
@@ -25,6 +37,20 @@ void	close_pipes(t_pipex *pipex)
 	}
 }
 
+static void	check_exec(t_pipex *pipex, char **argv, char **env)
+{
+	while (pipex->idx < pipex->cmd_nmbs)
+	{
+		if (pipex->idx == 0 && pipex->infile_ok == 0)
+		{
+			pipex->idx++;
+			continue ;
+		}else
+			child(pipex, argv, env);
+		pipex->idx++;
+	}
+}
+
 int	main(int argc, char **argv, char **envp)
 {
 	t_pipex	pipex;
@@ -38,16 +64,14 @@ int	main(int argc, char **argv, char **envp)
 	pipex.pipe = (int *)malloc(sizeof(int) * pipex.pipe_nmbs);
 	if (!pipex.pipe)
 		msg_error(ERR_PIPE);
-	pipex.env_path = find_path(envp);
-	pipex.cmd_paths = ft_split(pipex.env_path, ':');
-	if (!pipex.cmd_paths)
-		pipe_free(&pipex);
+	find_path(envp, &pipex);
 	creat_pipes(&pipex);
-	pipex.idx = -1;
-	while (++(pipex.idx) < pipex.cmd_nmbs)
-		child(pipex, argv, envp);
+	pipex.idx = 0;
+	check_exec(&pipex, argv, envp);
 	close_pipes(&pipex);
-	waitpid(-1, NULL, 0);
+	while (wait(NULL) > 0)
+	{
+	}
 	parent_free(&pipex);
 	return (0);
 }
